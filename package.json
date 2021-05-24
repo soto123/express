@@ -1,0 +1,22 @@
+{
+  "name": "express-prueba",
+  "version": "1.0.0",
+  "description": "Esta es una preuba del backend de express.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "express.js",
+    "node.js",
+    "hatchtemuco",
+    "borja",
+    "soto",
+    "beck"
+  ],
+  "author": "Borja Soto ( soto123 )",
+  "license": "ISC",
+  "dependencies": {
+    "morgan": "^1.10.0"
+  }
+}
