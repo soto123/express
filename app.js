@@ -1,21 +1,18 @@
-
 const express = require('express')
 const bp = require("body-parser")
 const port = 5000
 const app = express()
 var variables = require('./variables-globales.js')
 var variables_globales = new variables();
-console.log(variables_globales.get_host());
 
 
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'root',
-    password : '',
-    database: 'organizador_proyectos'
+    host     : variables_globales.get_host(),
+    user     : variables_globales.get_usuario(),
+    password : variables_globales.get_clave(),
+    database: variables_globales.get_base_datos()
 });
-
 
 app.use(bp.urlencoded({ extended: false }))
 
@@ -23,16 +20,39 @@ app.use(bp.json())
 
 app.use(require("morgan")("dev"))
 
+app.get('/user/:id', function (req, res){
+    res.send('user :' + req.params.id)
+})
+
+app.get('/proyecto/:id', function (req, res){
+    connection.connect();
+    connection.query('SELECT * FROM `proyectos` WHERE `id` = '+req.params.id, function(err, rows, fields) {
+        if (err) throw err;
+        res.json(rows[0])
+    });
+    connection.end();
+})
+
+app.get('/proyecto', function (req, res){
+    var json_envio;
+    connection.connect();
+    connection.query('SELECT * FROM `proyectos`', function(err, rows, fields) {
+        if (err) throw err;
+        json_envio = rows
+    });
+    connection.end();
+
+    res.json(json_envio)
+})
+
 app.get("/",(req,res) => {
     connection.connect();
-    
-    //connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
     connection.query('SELECT * FROM `proyectos`', function(err, rows, fields) {
-        
         if (err) throw err;
-        console.log('The solution is: ', rows);
+        for(let i = 0 ; i < rows.length ; i++){
+            console.log(rows[i].nombre);
+        }
     });
-
     connection.end();
     res.send("GET : hello world");
 })
