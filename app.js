@@ -5,7 +5,6 @@ const app = express()
 var variables = require('./variables-globales.js')
 var variables_globales = new variables();
 
-
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
     host     : variables_globales.get_host(),
@@ -15,45 +14,33 @@ var connection = mysql.createConnection({
 });
 
 app.use(bp.urlencoded({ extended: false }))
-
 app.use(bp.json())
-
 app.use(require("morgan")("dev"))
-
 app.get('/user/:id', function (req, res){
     res.send('user :' + req.params.id)
 })
 
 app.get('/proyecto/:id', function (req, res){
-    connection.connect();
     connection.query('SELECT * FROM `proyectos` WHERE `id` = '+req.params.id, function(err, rows, fields) {
         if (err) throw err;
         res.json(rows[0])
     });
-    connection.end();
 })
 
 app.get('/proyecto', function (req, res){
-    var json_envio;
-    connection.connect();
+    var respuesta = [];
     connection.query('SELECT * FROM `proyectos`', function(err, rows, fields) {
         if (err) throw err;
-        json_envio = rows
+        if(rows.length > 0){
+            res.json(rows);
+        }else{
+            res.send("No hay resultados")
+        }
     });
-    connection.end();
-
-    res.json(json_envio)
+    
 })
 
 app.get("/",(req,res) => {
-    connection.connect();
-    connection.query('SELECT * FROM `proyectos`', function(err, rows, fields) {
-        if (err) throw err;
-        for(let i = 0 ; i < rows.length ; i++){
-            console.log(rows[i].nombre);
-        }
-    });
-    connection.end();
     res.send("GET : hello world");
 })
 app.get("/json",(req,res) => {
@@ -70,5 +57,5 @@ app.delete("/",(req,res) => {
     res.send("DELETE : hello world");
 })
 app.listen(port, () => {
-    console.log("Express server listening on port "+port);
+    console.log(`Express server listening on port ${port}`);
 })
